@@ -197,7 +197,7 @@ const Servico = () => {
         ];
 
         return icons.map((iconObj) => (
-            <View key={iconObj.nota} style={styles.iconContainer}>
+            <View key={`icon-${iconObj.nota}`} style={styles.iconContainer}>
                 <TouchableOpacity onPress={() => setNota(iconObj.nota)}>
                     {React.cloneElement(iconObj.icon, {
                         color:
@@ -319,7 +319,7 @@ const Servico = () => {
                             <View style={styles.stars}>
                                 {[...Array(avaliacao.nota)].map((_, index) => (
                                     <FontAwesome
-                                        key={index}
+                                         key={`star-${avaliacao.id}-${index}`}
                                         name="star"
                                         size={24}
                                         color="yellow"
