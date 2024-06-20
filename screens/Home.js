@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
 
+
+const logoHome = require('../Images/logo_home.png'); 
+
 const Home = () => {
   const navigation = useNavigation();
 
@@ -48,7 +51,7 @@ const Home = () => {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <Image
-          source={{ uri: 'https://raw.githubusercontent.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e4-proj-infra-t4-connectlocal/9ac073c66a7f35c0f34f02b7b5885078d0648adf/src/frontend/src/images/logo_home.svg' }}
+          source={logoHome} 
           style={styles.image}
         />
         <Text style={styles.welcomeText}>Bem vindo ;)</Text>
@@ -101,24 +104,24 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f7f7f7',
   },
   imageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#4a4a4a',
+    backgroundColor: '#5a67d8',
   },
   image: {
-    width: 15,
-    height: 150,
+    width: 380,
+    height: 260,
   },
   welcomeText: {
     position: 'absolute',
     left: 20,
     bottom: 20,
     fontSize: 30,
-    color: 'white',
+    color: '#5a67d8',
   },
   formContainer: {
     flex: 2,
