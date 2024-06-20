@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#5a67d8',
   },
   image: {
-    width: 380,
-    height: 260,
+    width: '95%', 
+    height: '90%',
   },
   welcomeText: {
     position: 'absolute',
