@@ -110,16 +110,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#5a67d8',
+    paddingLeft: '5%',
+    paddingBottom: '18%',
+    marginBottom: -200,
   },
   image: {
-    width: '95%', 
-    height: '90%',
+    width: '95%',
+    height: '100%',
+    resizeMode: 'contain',
+
   },
   welcomeText: {
     position: 'absolute',
-    left: 20,
-    bottom: 20,
+    left: 40,
+    bottom: 90,
     fontSize: 30,
     color: '#5a67d8',
   },
@@ -128,10 +132,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+
   },
   logo: {
-    width: 150,
-    height: 20,
+    width: '50%',
+    height: '5%',
+    alignItems: 'center',
   },
   title: {
     marginTop: 20,
@@ -147,6 +153,10 @@ const styles = StyleSheet.create({
   link: {
     color: '#5a67d8',
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
+  label: {
+    marginTop: 5,
   },
   input: {
     width: '100%',
@@ -155,10 +165,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginTop: 15,
+    marginTop: 5,
   },
   button: {
-    width: '100%',
+    width: '60%',
     height: 40,
     backgroundColor: '#5a67d8',
     justifyContent: 'center',
