@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Alert, Image, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
@@ -14,6 +14,7 @@ const Home = () => {
     email: '',
     password: ''
   });
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   async function handleSubmit() {
     if (!login.email || !login.password) {
@@ -48,105 +49,122 @@ const Home = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={logoHome} 
-          style={styles.image}
-        />
-        <Text style={styles.welcomeText}>Bem vindo ;)</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      {!isInputFocused && (
+          <View style={styles.imageContainer}>
+            <Image
+              source={logoHome}
+              style={styles.image}
+            />
+            <Text style={styles.welcomeText}>Bem vindo ;)</Text>
+          </View>
+        )}
 
-      <View style={styles.formContainer}>
-        <Image
-          source={{ uri: 'https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e4-proj-infra-t4-connectlocal/blob/main/src/frontend/src/images/ConnectLogo.png?raw=true' }}
-          style={styles.logo}
-        />
-        <Text style={styles.title}>Entrar</Text>
-        <Text style={styles.subTitle}>
-          Novo por aqui?{' '}
-          <TouchableOpacity onPress={() => {
-            console.log('Navigating to Cadastro');
-            navigation.navigate('Cadastro');
-          }}>
-            <Text style={styles.link}>Cadastre-se</Text>
-          </TouchableOpacity>
-        </Text>
-        <View style={styles.form}>
-          <Text style={styles.label}>Email:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="exemplo@exemplo.com"
-          keyboardType="email-address"
-          onChangeText={(text) => setLogin({ ...login, email: text })}
-          value={login.email}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <Text style={styles.label}>Senha:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="••••••••"
-          secureTextEntry
-          maxLength={8}
-          onChangeText={(text) => setLogin({ ...login, password: text })}
-          value={login.password}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-    </View>
+        <View style={styles.formContainer}>
+          <Image
+            source={{ uri: 'https://github.com/ICEI-PUC-Minas-PMV-ADS/pmv-ads-2024-1-e4-proj-infra-t4-connectlocal/blob/main/src/frontend/src/images/ConnectLogo.png?raw=true' }}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Entrar</Text>
+          <View style={styles.subTitleContainer}>
+            <Text style={styles.subTitle}>
+              Novo por aqui?{' '}
+            </Text>
+            <TouchableOpacity onPress={() => {
+              console.log('Navigating to Cadastro');
+              navigation.navigate('Cadastro');
+            }}>
+              <Text style={styles.link}>Cadastre-se</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.form}>
+            <Text style={styles.label}>Email:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="exemplo@exemplo.com"
+              keyboardType="email-address"
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
+              onChangeText={(text) => setLogin({ ...login, email: text })}
+              value={login.email}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Text style={styles.label}>Senha:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="••••••••"
+              secureTextEntry
+              maxLength={8}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
+              onChangeText={(text) => setLogin({ ...login, password: text })}
+              value={login.password}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+              <Text style={styles.buttonText}>Entrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f7f7f7',
   },
-  imageContainer: {
-    flex: 1,
+  scrollViewContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingLeft: '5%',
-    paddingBottom: '18%',
-    marginBottom: -200,
+  },
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   image: {
-    width: '95%',
-    height: '100%',
+    width: 300,
+    height: 120,
     resizeMode: 'contain',
 
   },
   welcomeText: {
     position: 'absolute',
-    left: 40,
-    bottom: 90,
+    alignItems: 'center',
+    top: 80,
     fontSize: 30,
     color: '#5a67d8',
   },
-  formContainer: {
-    flex: 2,
-    justifyContent: 'center',
+ formContainer: {
+    width: '100%',
+    height: '70%',
     alignItems: 'center',
     paddingHorizontal: 20,
-
   },
   logo: {
-    width: '50%',
-    height: '5%',
-    alignItems: 'center',
+    width: '70%',
+    height: '10%',
+    marginBottom: 20,
   },
   title: {
-    marginTop: 20,
     fontSize: 24,
     fontWeight: 'bold',
     color: '#5a67d8',
+    marginBottom: 10,
+  },
+  subTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   subTitle: {
-    marginTop: 10,
     fontSize: 16,
     color: '#4a5568',
   },
@@ -154,9 +172,15 @@ const styles = StyleSheet.create({
     color: '#5a67d8',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+    marginLeft: 5,
+  },
+  form: {
+    width: '100%',
   },
   label: {
-    marginTop: 5,
+    fontSize: 16,
+    color: '#4a5568',
+    marginBottom: 5,
   },
   input: {
     width: '100%',
@@ -168,7 +192,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   button: {
-    width: '60%',
+    width: '100%',
     height: 40,
     backgroundColor: '#5a67d8',
     justifyContent: 'center',

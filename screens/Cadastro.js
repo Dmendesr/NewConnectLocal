@@ -370,8 +370,8 @@ const styles = StyleSheet.create({
     },
     scrollViewContent: {
         paddingHorizontal: 10,
-        paddingTop: 10,
-        paddingBottom: 20
+        //paddingTop: 20,
+        paddingBottom: 10
     },
     header: {
         alignItems: 'center',
