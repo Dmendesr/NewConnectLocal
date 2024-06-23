@@ -12,8 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { api } from "../services/api";
 import { logOut as logOutFunction } from "../services/Functions";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
+
 
 const Index = () => {
   const navigation = useNavigation();
@@ -23,6 +23,7 @@ const Index = () => {
   const [content, setContent] = useState("servicos");
   const [tipoServico, setTipoServico] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +39,15 @@ const Index = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await isAuth();
+      setIsAuthenticated(auth);
+    };
+
+    checkAuth();
+  }, []);
+
   const isAuth = async () => {
     const jwt = await AsyncStorage.getItem("jwtToken");
     if (!jwt) return false;
@@ -47,7 +57,7 @@ const Index = () => {
     if (!tokenTimestampStr) return false;
 
     const tokenTimestamp = parseInt(tokenTimestampStr);
-    const expirationTime = 8 * 60 * 60 * 1000; // 8 hours
+    const expirationTime = 8 * 60 * 60 * 1000; // 8 horas
     return now - tokenTimestamp <= expirationTime;
   };
 
@@ -189,7 +199,7 @@ const Index = () => {
     if (content === "servicos") {
       return (
         <ScrollView style={styles.scrollView}>
-          <View style={styles.container}>
+          <View style={styles.innerContainer}>
             {user.cnpj && (
               <View style={styles.formContainer}>
                 <Text style={styles.label}>Cadastrar Serviço</Text>
@@ -205,6 +215,7 @@ const Index = () => {
                   value={descricao}
                   onChangeText={setDescricao}
                   maxLength={255}
+                  multiline={true}
                 />
                 <TouchableOpacity
                   style={styles.submitButton}
@@ -243,7 +254,7 @@ const Index = () => {
     } else {
       return (
         <ScrollView style={styles.scrollView}>
-          <View style={styles.container}>
+          <View style={styles.innerContainer}>
             {avaliacoes.map((avaliacao) => (
               <View key={avaliacao.id} style={styles.card}>
                 <View>
@@ -281,45 +292,40 @@ const Index = () => {
     }
   };
 
-  if (isAuth()) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text onPress={handleUserClick}>
-            Olá, {user.name && user.name.split(" ")[0]}
-          </Text>
-          <TouchableOpacity onPress={logOut}>
-            <Ionicons name="log-out-outline" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.nav}>
-          <TouchableOpacity onPress={() => handleContent("servicos")}>
-            <Text
-              style={
-                content === "servicos" ? styles.activeNavText : styles.navText
-              }
-            >
-              Serviços
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleContent("avaliacoes")}>
-            <Text
-              style={
-                content === "avaliacoes" ? styles.activeNavText : styles.navText
-              }
-            >
-              Avaliações
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {renderServices()}
-      </View>
-    );
-  } else {
+  if (!isAuthenticated) {
     Alert.alert("Sessão expirada", "Por favor, faça login novamente.");
     navigation.navigate("Home");
     return null;
   }
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text onPress={handleUserClick}>
+          Olá, {user.name?.split(" ")[0]}
+        </Text>
+        <TouchableOpacity onPress={logOut}>
+          <Ionicons name="log-out-outline" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.nav}>
+        <Text
+          style={content === "servicos" ? styles.activeNavText : styles.navText}
+          onPress={() => handleContent("servicos")}
+        >
+          Serviços
+        </Text>
+        <Text
+          style={
+            content === "avaliacoes" ? styles.activeNavText : styles.navText
+          }
+          onPress={() => handleContent("avaliacoes")}
+        >
+          Avaliações Dadas
+        </Text>
+      </View>
+      {renderServices()}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -327,6 +333,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+  },
+  contentContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  innerContainer: {
+    flex: 1,
   },
   scrollView: {
     marginHorizontal: 20,
