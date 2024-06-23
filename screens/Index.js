@@ -7,13 +7,13 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { api } from "../services/api";
 import { logOut as logOutFunction } from "../services/Functions";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
-
 
 const Index = () => {
   const navigation = useNavigation();
@@ -23,7 +23,7 @@ const Index = () => {
   const [content, setContent] = useState("servicos");
   const [tipoServico, setTipoServico] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,22 +31,22 @@ const Index = () => {
       if (user) {
         await loadServices(user);
         await loadAvaliacoes(user);
-      } else {
+      }
+      setLoading(false);
+    };
+
+    const checkAuth = async () => {
+      const auth = await isAuth();
+      if (!auth) {
+        Alert.alert("Sessão expirada", "Por favor, faça login novamente.");
         navigation.navigate("Home");
+      } else {
+        fetchData();
       }
     };
 
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const auth = await isAuth();
-      setIsAuthenticated(auth);
-    };
-
     checkAuth();
-  }, []);
+  }, [navigation]);
 
   const isAuth = async () => {
     const jwt = await AsyncStorage.getItem("jwtToken");
@@ -88,6 +88,9 @@ const Index = () => {
       setServices(response.data);
     } catch (error) {
       console.error("Error loading services:", error);
+      if (error.response && error.response.status === 401) {
+        await logOut();
+      }
     }
   };
 
@@ -105,6 +108,9 @@ const Index = () => {
       setAvaliacoes(response.data);
     } catch (error) {
       console.error("Error loading reviews:", error);
+      if (error.response && error.response.status === 401) {
+        await logOut();
+      }
     }
   };
 
@@ -118,8 +124,8 @@ const Index = () => {
 
   const logOut = async () => {
     try {
-      await logOutFunction(); // Chama a função de logout
-      navigation.navigate("Home"); // Navega para a tela Home após o logout
+      await logOutFunction();
+      navigation.navigate("Home");
     } catch (error) {
       console.error("Error during logout:", error);
       Alert.alert("Erro", "Erro ao sair. Por favor, tente novamente.");
@@ -263,9 +269,9 @@ const Index = () => {
                   </Text>
                   <Text>{avaliacao.comentario}</Text>
                   <View style={styles.ratingContainer}>
-                    {Array.from({ length: avaliacao.nota }).map((_, i) => (
+                    {Array.from({ length: avaliacao.nota }).map((_, idx) => (
                       <FontAwesome
-                        key={i}
+                        key={`${avaliacao.id}-${idx}`}
                         name="star"
                         size={18}
                         color="#FFD700"
@@ -292,11 +298,14 @@ const Index = () => {
     }
   };
 
-  if (!isAuthenticated) {
-    Alert.alert("Sessão expirada", "Por favor, faça login novamente.");
-    navigation.navigate("Home");
-    return null;
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -333,10 +342,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
-  },
-  contentContainer: {
-    flexGrow: 1,
-    paddingBottom: 20,
   },
   innerContainer: {
     flex: 1,
@@ -424,6 +429,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
